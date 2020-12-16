@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block head %}
+    {{ super() }}
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+{% endblock %}
+
+{% block navbar %}
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <a class="navbar-brand" href="#">SMAUG</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item active"><a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a></li>
+        {% if not current_user.is_authenticated %}
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.login') }}">{{ _('Login') }}</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.registration') }}">{{ _('Registration') }}</a></li>
+        {% else %}
+            <li class="nav-item"><a class="nav-link">{{ current_user.name }}</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('user.get_lockers') }}">{{ _('Lockers') }}</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('user.get_requests') }}">{{ _('Requests') }}</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('user.create_request') }}">{{ _('New request') }}</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('user.show_token') }}">{{ _('Show token') }}</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.logout') }}">{{ _('Logout') }}</a></li>
+        {% endif %}
+    </ul>
+  </div>
+</nav>
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        {% for message in get_flashed_messages() %}
+            <div class="alert alert-warning">
+                <button type="button" class="close" data-dismiss="alert">&times;</button>
+                {{ message }}
+            </div>
+        {% endfor %}
+        {% block page_content %}{% endblock %}
+    </div>
+{% endblock %}

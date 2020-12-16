@@ -1,0 +1,31 @@
+{% extends "smaug_base.html" %}
+
+{% block title %}Requests{% endblock %}
+
+
+{% block content %}
+    <h1>Requests</h1>
+
+    <table class="table" style="max-width: 1200px; min-width: 1200px; margin-left: auto; margin-right: auto">
+        <thead>
+            <tr>
+                <th>Request ID</th>
+                <th>Request status</th>
+                <th>Price per minute (Wei)</th>
+                <th>Time until deadline (min)</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for request in requests %}
+                <tr>
+                    <td>{{ request.request_id }}</td>
+                    <td>{{ request.status }}</td>
+                    <td>{{ request.amount }}</td>
+                    <td>{{ request.duration }}</td>
+                    <td><a href="{{ details_path_prefix }}/{{ request.request_id }}" class="btn btn-info" role="button">Show details</a></td>
+                </tr>
+            {% endfor %}
+        </tbody>
+
+    </table>
+{% endblock %}

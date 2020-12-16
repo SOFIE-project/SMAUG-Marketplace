@@ -1,0 +1,5 @@
+[
+  {"lockerId": 1234, "price": 35, "volume": 15},
+  {"lockerId": 123, "price": 11, "volume": 1},
+  {"lockerId": 123, "price": 11, "volume": 1, "smartContractAdds":  "ciao"}
+]

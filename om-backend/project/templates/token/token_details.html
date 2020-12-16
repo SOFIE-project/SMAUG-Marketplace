@@ -1,0 +1,68 @@
+{% extends "smaug_base.html" %}
+
+{% block title %}Token details{% endblock %}
+
+
+{% block content %}
+    <h1>Token details</h1>
+
+    <div class="container">
+    <form class="form-horizontal">
+		{% if not token %}
+			<div class="alert alert-danger" role="alert">No access token found. Please press "Get new token"</div>
+		{% endif %}
+
+        <div class="form-group row">
+			<label class="control-label col-sm-2" for="digest">Digest</label>
+            <div class="col-sm-10">
+                <input id="digest" class="form-control long" readonly="readonly" type="text" value="{{ token.digest }}">
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <label class="control-label col-sm-2">Encoded</label>
+            <label class="control-label col-sm-2" for="encoded_body">Full body</label>
+			<input id="encoded_body" class="form-control col-sm-8 long" readonly="readonly" type="text" value="{{ token.encoded }}">
+        </div>
+
+        <div class="form-group row"></div>
+
+        <div class="form-group row">
+            <label class="control-label col-sm-2" for=""></label>
+            <label class="control-label col-sm-2" for="nonce">Nonce</label>
+			<input id="nonce" class="form-control col-sm-8 long" readonly="readonly" type="text" value="{{ token.nonce }}">
+        </div>
+
+        <div class="form-group row">
+            <label class="control-label col-sm-2"></label>
+            <label class="control-label col-sm-2" for="method_selector">Method selector</label>
+			<input id="method_selector" class="form-control col-sm-8 long" readonly="readonly" type="text" value="{{ token_body.method_selector }}">
+        </div>
+
+        <div class="form-group row">
+            <label class="col-sm-2"></label>
+            <label class="control-label col-sm-2" for="request_creator_address">Request creator address</label>
+			<input id="request_creator_address" class="form-control col-sm-8 long" readonly="readonly" type="text" value="{{ token_body.request_creator_address }}">
+        </div>
+
+        <div class="form-group row">
+            <label class="control-label col-sm-2"></label>
+            <label class="control-label col-sm-2" for="contract_address">Contract address</label>
+			<input id="contract_address" class="form-control col-sm-8 long" readonly="readonly" type="text" value="{{ token_body.contract_address }}">
+        </div>
+
+        <div class="form-group row">
+            <label class="control-label col-sm-2" for="signature">Signature</label>
+            <div class="col-sm-10">
+                <input id="signature" class="form-control long long" readonly="readonly" type="text" value="{{ token.signature }}">
+            </div>
+        </div>
+
+        <td><a href="/user/get_token?ethereum_address={{ ethereum_address }}" class="btn btn-primary" role="button">Get new token</a></td>
+    </form>
+
+    </div>
+
+
+
+{% endblock %}

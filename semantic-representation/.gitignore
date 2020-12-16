@@ -1,0 +1,20 @@
+# Python
+__pycache__
+*/__pycache__
+
+
+# Database
+app.db
+
+#logs
+app.db
+logs/
+
+# Linux tools
+container_reset.sh
+*.swp
+.env
+env/
+
+# IDE
+.idea

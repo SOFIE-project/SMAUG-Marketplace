@@ -1,0 +1,204 @@
+{% extends "smaug_base.html" %}
+{% block title %}New request{% endblock %}
+{% block scripts %}
+
+    {{ super() }}
+
+    <script type="text/javascript">
+        /**
+             * Adjust the indices of form fields when removing items.
+             */
+            function adjustIndices(removedIndex) {
+                var $forms = $('.subform');
+
+                $forms.each(function(i) {
+                    var $form = $(this);
+                    var index = parseInt($form.data('index'));
+                    var newIndex = index - 1;
+
+                    if (index < removedIndex) {
+                        // Skip
+                        return true;
+                    }
+
+                    // Change ID in form itself
+                    $form.attr('id', $form.attr('id').replace(index, newIndex));
+                    $form.data('index', newIndex);
+
+                    // Change IDs in form inputs
+                    $form.find('input').each(function(j) {
+                        var $item = $(this);
+                        $item.attr('id', $item.attr('id').replace(index, newIndex));
+                        $item.attr('name', $item.attr('name').replace(index, newIndex));
+                    });
+                });
+            }
+
+            /**
+             * Remove a form.
+             */
+            function removeForm() {
+                var $removedForm = $(this).closest('.subform');
+                var removedIndex = parseInt($removedForm.data('index'));
+
+                $removedForm.remove();
+
+                // Update indices
+                adjustIndices(removedIndex);
+            }
+
+            /**
+             * Add a new form.
+             */
+            function addForm() {
+                var $templateForm = $('#instantrentrule-_-form');
+
+                if (!$templateForm) {
+                    console.log('[ERROR] Cannot find template');
+                    return;
+                }
+
+                // Get Last index
+                var $lastForm = $('.subform').last();
+
+                var newIndex = 0;
+
+                if ($lastForm.length > 0) {
+                    newIndex = parseInt($lastForm.data('index')) + 1;
+                }
+
+                // Maximum of 20 subforms
+                if (newIndex > 20) {
+                    console.log('[WARNING] Reached maximum number of elements');
+                    return;
+                }
+
+                // Add elements
+                var $newForm = $templateForm.clone();
+
+                $newForm.attr('id', $newForm.attr('id').replace('_', newIndex));
+                $newForm.data('index', newIndex);
+
+                $newForm.find('input').each(function(idx) {
+                    var $item = $(this);
+
+                    $item.attr('id', $item.attr('id').replace('_', newIndex));
+                    $item.attr('name', $item.attr('name').replace('_', newIndex));
+                });
+
+                // Append
+                $('#subforms-container').append($newForm);
+                $newForm.addClass('subform');
+                $newForm.removeClass('is-hidden');
+
+                $newForm.find('.remove').click(removeForm);
+            }
+
+
+            $(document).ready(function() {
+                {#$.noConflict();#}
+                $('#add').click(addForm);
+                $('.remove').click(removeForm);
+            });
+
+    </script>
+
+
+{% endblock %}
+{% block head %}
+    {{ super() }}
+
+
+{% endblock %}
+
+
+
+
+{% block content %}
+	<h1>{{ title }}</h1>
+
+	<form method="post" action="/user/create_request">
+    <div class="container">
+        <div class="form-group row">
+        {{ form.csrf_token }}
+			<label class="col-form-label">{{ form.locker_id.label }}</label>
+            <div class="col-10">
+                    {{ form.locker_id }}
+            </div>
+        </div>
+
+
+
+        <div class="form-group row">
+            <table>
+                <tr>
+                    <td>
+                        <label class="col-form-label">* Rental start date</label>
+                        {{ form.start_date(class_="form-control dp") }}
+                    </td>
+
+                    <td style="padding-left: 20px">
+                        <label class="col-form-label">* Rental start time</label>
+                        {{ form.start_time(class_="form-control") }}
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>
+                        <label class="col-form-label">* Rental end date</label>
+                        {{ form.end_date(class_="form-control") }}
+                    </td>
+
+                    <td style="padding-left: 20px">
+                        <label class="col-form-label">* Rental end time</label>
+                        {{ form.end_time(class_="form-control") }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="col-form-label">* Offer deadline date</label>
+                        {{ form.deadline_date(class_="form-control") }}
+                    </td>
+
+                    <td style="padding-left: 20px">
+                        <label class="col-form-label">* Offer deadline time</label>
+                        {{ form.deadline_time(class_="form-control") }}
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+
+        <div class="form-group row">
+          <label class="col-form-label">Cost per minute</label>
+          <div class="col-10">
+            {{ form.cost_per_minute(class_="form-control") }}
+          </div>
+        </div>
+
+        <div class="form-group row" style="margin-bottom: 50px; max-width: 600px;">
+            <label class="col-form-label">Instant rent rules</label>
+
+{#            <a id="add" href="#">Add Lap</a>#}
+            <div id="subforms-container">
+                {% for subform in form.instant_rent_rules %}
+                    <div id="instantrentrule-{{ loop.index0 }}-form" class="subform" data-index="{{ loop.index0 }}">
+                    {{ subform.label }} {{ subform }}
+
+{#                    <a class="remove" href="#">Remove</a>#}
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="form-group row">
+			<input class="btn btn-primary" id="submit" name="submit" type="submit" value="Create request">
+
+			<a href="{{ forward_path }}" class="btn btn-default" role="button">Cancel</a>
+        </div>
+
+
+    </div>
+	</form>
+
+{% endblock %}

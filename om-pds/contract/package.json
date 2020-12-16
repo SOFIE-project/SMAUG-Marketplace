@@ -1,0 +1,14 @@
+{
+  "name": "sofie-pds",
+  "version": "1.0.4",
+  "description": "SA smart contract used for logging access token generated with SOFIE PDS component.",
+  "files": [
+    "*PDS.sol"
+  ],
+  "repository": "https://github.com/SOFIE-project/Privacy-and-Data-Sovereignty",
+  "author": "SOFIE Project",
+  "license": "APL 2.0",
+  "dependencies": {
+    "@openzeppelin/contracts": "^2.5.0"
+  }
+}

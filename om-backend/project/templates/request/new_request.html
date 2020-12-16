@@ -1,0 +1,80 @@
+{% extends "smaug_base.html" %}
+{% block title %}New request{% endblock %}
+{% block head %}
+    {{ super() }}
+
+    <script type="text/javascript">
+        $(document).ready( function() {
+            $.noConflict();
+            let rules = $('#rules').DataTable( {
+                "paging": false,
+                "ordering": false,
+                "info": false,
+                "searching": false,
+            });
+
+            $('#new_rule').on('click', function () {
+                rules
+                    .row
+                    .add( [
+                        $('#rule_time').val(),
+                        $('#rule_cost').val(),
+                        "<button class=\"btn btn-danger\" type=\"button\">Delete</button>"
+                    ]).draw(false);
+                $('#rule_time').val("");
+                $('#rule_cost').val("");
+            });
+
+            $('#rules').on('click', 'tr', function () {
+                rules
+                    .row($(this))
+                    .remove()
+                    .draw();
+            });
+        });
+
+    </script>
+{% endblock %}
+
+
+{% block content %}
+  <h1>Create new request</h1>
+    <div class="container">
+        <form method="POST" action="/create_request2">
+        {{ form.csrf_token }}
+        {{ form.locker_id.label }} {{ form.locker_id }}
+        {{ form.start_date.label }} {{ form.start_date(size=20) }}
+        {{ form.start_time.label }} {{ form.start_time(size=20) }}
+
+        <table id="rules" class="table" style="max-width: 250px; min-width: 250px; margin-left: 50px">
+            <thead>
+                <tr>
+                    <th>Time</th>
+                    <th>Cost</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+        </table>
+
+            <label class="col-2 col-form-label">Time (min)</label>
+            <input id="rule_time" type="number" class="form-control mb-2 mr-sm-2 mb-sm-0">
+
+            <label class="col-2 col-form-label" style="margin-left: 20px">Cost</label>
+            <input id="rule_cost" type="number" class="form-control mb-2 mr-sm-2 mb-sm-0">
+
+            <button id="new_rule" class="btn btn-default" type="button">Add rule</button>
+
+        <input type="submit" class="btn btn-primary" value="Submit">
+        </form>
+    </div>
+
+{% endblock %}
+
+
+

@@ -1,0 +1,54 @@
+smart_locker_owners:
+- address: Address 1
+  description: Description 1
+  did: V4SGRU86Z58d6TV7PBUe6f
+  id: test_user_1
+  logo: https://logo_url_1.com
+  name: Test User 1
+  phone: (+358) 1111111111
+  url: https://url_1.com
+  verkey: GJ1SzoWzavQYfNL9XkaJdrQejfztN4XqdsiV4ct3LXKL
+- address: Address 2
+  description: Description 2
+  did: V4SGRU86Z58d6TV7PBUe6f
+  id: test_user_2
+  logo: https://logo_url_2.com
+  name: Test User 2
+  phone: (+358) 2222222222
+  url: https://url_2.com
+  verkey: GJ1SzoWzavQYfNL9XkaJdrQejfztN4XqdsiV4ct3LXKL
+- address: Address 3
+  description: Description 3
+  did: V4SGRU86Z58d6TV7PBUe6f
+  id: test_user_3
+  logo: https://logo_url_3.com
+  name: Test User 3
+  phone: (+358) 3333333333
+  url: https://url_3.com
+  verkey: GJ1SzoWzavQYfNL9XkaJdrQejfztN4XqdsiV4ct3LXKL
+
+smart_lockers:
+- additional_images:
+  - https://locker_1_1.com
+  - https://locker_1_2.com
+  - https://locker_1_3.com
+  chain_id: 666
+  description: Smart Locker 1
+  icon_image: https://locker_1.com
+  id: locker_1
+  location:
+    lat: 4
+    lon: 4
+  loc_description: '1'
+  lock_mechanism: push-to-lock
+  marketplace_smart_contract_address: 0x1231238712380e0i123i12031
+  name: Test Smart Locker 1
+- chain_id: 666
+  icon_image: https://locker_2.com
+  id: locker_2
+  location:
+    lat: 4
+    lon: 4
+  lock_mechanism: push-to-lock-after-delay
+  marketplace_smart_contract_address: 0x1231238712380e0i123i12031
+  name: Test Smart Locker 2

@@ -1,0 +1,16 @@
+{
+    "compilerOptions": {
+      "target": "ES2018",
+      "module": "commonjs",
+      "strict": true,
+      "moduleResolution": "node",
+      "noImplicitAny": false,
+      "lib": ["ES2018"],
+      "sourceMap": true,
+      "typeRoots": ["./node_modules/@types", "./types"],
+      "types": ["node", "truffle-contracts"],
+      "outDir": "./app"
+    },
+    "include": ["**/*.ts"],
+    "exclude": ["node_modules", "example", "build"]
+  }

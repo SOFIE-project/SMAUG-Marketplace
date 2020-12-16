@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+
+# From https://stackoverflow.com/a/246128/4048201
+CURRENT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+STATE_DIR=$CURRENT_DIR/../authorisation_state
+ETHEREUM_NETWORK_NAME="ethereum"
+CONTAINER_NAME="Authorisation"
+CONTAINER_NETWORK_ALIAS="authorisation"
+
+
+##### CHANGE HOST_PORT VARIABLE, IF NEEDED #####
+HOST_PORT=8546
+################################################
+
+
+# Create needed Docker network, if it does not exist
+docker network create "$ETHEREUM_NETWORK_NAME" > /dev/null 2>&1
+DOCKER_NETWORK_CREATION_RETURN_CODE=$?
+echo -n "Docker network $ETHEREUM_NETWORK_NAME"
+if [[ $DOCKER_NETWORK_CREATION_RETURN_CODE == 0 ]]; then
+    echo " created."
+else
+    echo " already existing."
+fi
+
+# Remove old container
+docker rm -f "$CONTAINER_NAME" > /dev/null 2>&1
+if [[ $? == 0 ]]; then
+    echo "Previously running $CONTAINER_NAME deleted."
+fi
+
+##### NOT NEEDED, AT THE MOMENT. FOUND ANOTHER WAY TO HANDLE CONTAINER STOP/RESTART
+# echo "Calling reset script first..."
+# source ./reset_blockchain_state
+###################################################################################
+
+# Create the Docker container
+DOCKER_CONTAINER_ID_OR_ERROR=$(docker run -tid --name "$CONTAINER_NAME" -v $STATE_DIR:/data -p $HOST_PORT:8545 --rm --network "$ETHEREUM_NETWORK_NAME" --network-alias $CONTAINER_NETWORK_ALIAS trufflesuite/ganache-cli --db /data --debug --verbose --allowUnlimitedContractSize --mnemonic "main blouse fashion brand own rocket fluid notable vacuum gain guitar leaf" -i 666 2>&1)
+
+if [[ $? == 0 ]]; then
+    echo "$CONTAINER_NAME container started and listening on 127.0.0.1:$HOST_PORT"
+    exit 0
+else
+    echo "$DOCKER_CONTAINER_ID_OR_ERROR"
+fi

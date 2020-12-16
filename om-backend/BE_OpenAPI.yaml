@@ -1,0 +1,643 @@
+openapi: 3.0.0
+
+info:
+  title: SMAUG OpenAPI
+  description: SMAUG OpenAPI for the smart locker-related operations.
+  version: 1.0.0
+  contact:
+    name: Antonio Antonino
+    email: antonio.antonino@ericsson.com
+    
+externalDocs:
+  description: Link to LMF Confluence page for SMAUG Semantic Model
+  url: https://sofie-iot.atlassian.net/wiki/spaces/SUC/pages/782598145/Semantic+Model
+    
+servers:
+  - url: /api/v1
+
+paths:
+  /td/{locker_id}:
+    parameters:
+      - in: path
+        name: locker_id
+        description: The ID of the locker. The complete URL, including this parameter, will be broadcasted by smart lockers over BLE.
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 1.844674407E19
+        required: true  
+    get:
+      operationId: getLockerTD
+      summary: Retrieve the SMAUG Thing Description document for a given locker.
+      tags:
+        - SMAUG Thing Description
+      responses:
+        200:
+          description: Returns the Thing Description for the given locker.
+          content:
+            application/ld+json:
+              schema:
+                description: For a description of the TD schema, please visit the [LMF Confluence Page](https://sofie-iot.atlassian.net/wiki/spaces/SUC/pages/782598145/Semantic+Model#Thing-Description-in-SMAUG)
+          links:
+            getLockerDetails:
+              operationId: getLockerDetails
+              parameters:
+                locker_id: "$request.path.locker_id"            
+        404:
+          description: The locker with the given ID was not found.
+        5XX:
+          description: Unexpected error.
+  /lockers:
+    post:
+      operationId: registerLocker
+      summary: "! PARTIALLY IMPLEMENTED ! Register a new smart locker under a owner's ownership."
+      tags:
+        - Smart locker
+      security:
+        - BearerAuth: []
+      requestBody:
+        description: At the moment, the owner ID is taken from the DB, but it should be taken from the JWT used in the request. For the JSON schema validating the body of this request, please check the [LMF Confluence Page](https://sofie-iot.atlassian.net/wiki/spaces/SUC/pages/782598145/Semantic+Model#SMAUG-JSON-schema-for-smart-locker-details)
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LockerInput"
+            example:
+              name: Heureka! Locker
+              description: Keep your things safe during your amazing trip in the world of Science!
+              location:
+                lat: 60.287480
+                lon: 25.040618
+                additional_info: Just next to the door of room 211.
+              icon_image: https://signifi.com/wp-content/uploads/smart-lockers.png
+              additional_images:
+                - https://www.visitfinland.com/app/uploads/sites/10/2016/05/bioyo_yleiskuva3-600x400.jpg
+                - https://upload.wikimedia.org/wikipedia/commons/thumb/6/66/Vantaa-heureka.jpg/320px-Vantaa-heureka.jpg
+              lock_mechanism: tap-to-lock
+      responses:
+        201:
+          description: Smart locker succesfully registered.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    minimum: 1
+                    maximum: 1.844674407E19
+                    description: ID of the registered locker.
+              example:
+                id: 198273123
+          links:
+            getLockerDetails:
+              operationId: getLockerDetails
+              parameters:
+                locker_id: "$response.body#/id"
+            getLockerTD:
+              operationId: getLockerTD
+              parameters:
+                locker_id: "$response.body#/id"
+            getLockerRequests:
+              operationId: getLockerRequests
+              parameters:
+                locker_id: "$response.body#/id"
+        400:
+          description: Bad data in input.
+        401:
+          description: Invalid JWT used for the request.
+        409:
+          description: Duplicate locker with given name under the user's ownership.
+        5XX:
+          description: Unexpected error.          
+  /lockers/{locker_id}:
+    parameters:
+      - in: path
+        name: locker_id
+        description: The ID of the locker.
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 1.844674407E19
+        required: true  
+    get:
+      operationId: getLockerDetails
+      summary: "Retrieve the details for a given smart locker."
+      tags:
+        - Smart locker
+      responses:
+        200:
+          description: Returns the details for the given locker.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  locker:
+                    $ref: "#/components/schemas/LockerCompleteInfo"
+                  marketplace:
+                    $ref: "#/components/schemas/MarketplaceInfo"
+                required: 
+                - locker
+              example:
+                locker:
+                  name: Heureka! Smart Locker
+                  location:
+                    lat: 60.287480
+                    lon: 25.040618
+                    additional_info: Just next to the door of room 211.
+                  icon_image: https://signifi.com/wp-content/uploads/smart-lockers.png
+                  additional_images:
+                    - https://www.visitfinland.com/app/uploads/sites/10/2016/05/bioyo_yleiskuva3-600x400.jpg
+                    - https://upload.wikimedia.org/wikipedia/commons/thumb/6/66/Vantaa-heureka.jpg/320px-Vantaa-heureka.jpg
+                  lock_mechanism: tap-to-lock
+                  owner_id: did:sov:1857413a1213a
+                  id: 412312312
+                marketplace:
+                  chain_id: 147
+                  marketplace_smart_contract_address: "0x51Cdd045E893528fB7C6F2DCEB07Efa9eb2FB375"
+          links:
+            getOwnerDetails:
+              operationId: getOwnerDetails
+              parameters:
+                owner_id: "$response.body#/locker/owner_id"
+            getLockerRequests:
+              operationId: getLockerRequests
+              parameters:
+                locker_id: "$request.path.locker_id"
+        404:
+          description: The locker with the given ID was not found.
+        5XX:
+          description: Unexpected error.
+  /lockers/{locker_id}/requests:
+    parameters:
+      - in: path
+        name: locker_id
+        description: The ID of the locker.
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 1.844674407E19
+        required: true  
+    get:
+      operationId: getLockerRequests
+      summary: "!!! PARTIALLY IMPLEMENTED !!! Retrieve the open requests for a smart locker, optionally filtered by user's input. At the moment, user's filtering other than filter open requests is not supported."
+      tags:
+        - Smart locker
+        - Marketplace
+      parameters:
+        - in: query
+          name: valid_at
+          description: OPTIONAL. The time at which the request must be valid. If not specified, all the open requests are returned. **Currently not supported**.
+          schema:
+            type: string
+            format: date-time
+        - in: query
+          name: valid_for
+          description: OPTIONAL. How long must the request be valid, in minutes, from the time specified in `valid_at` (e.g. 30 min). If `valid_at` is specified, it must also be specified. **Currently not supported**.
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 1.844674407E19
+        - in: query
+          name: only_auction
+          description: OPTIONAL, default false. If true, restricts the results to only contain requests that accept auctions, with no instant rent support. **Currently not supported**.
+          schema:
+            type: boolean
+            default: false
+        - in: query
+          name: only_open
+          description: OPTIONAL, default false. If true, restricts the results to only contain open requests.
+          schema:
+            type: boolean
+            default: false
+      responses:
+        200:
+          description: Returns all the request IDs matching the user's requirements for the given smart locker.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  open:
+                    description: The list of open requests for the smart locker.
+                    type: array
+                    items:
+                      type: integer
+                      minimum: 1
+                      maximum: 1.844674407E19
+                  closed:
+                    description: The list of closed requests for the smart locker.
+                    type: array
+                    items:
+                      type: integer
+                      minimum: 1
+                      maximum: 1.844674407E19 
+                  decided:
+                    description: The list of decided requests for the smart locker.
+                    type: array
+                    items:
+                      type: integer
+                      minimum: 1
+                      maximum: 1.844674407E19
+                required:
+                  - open
+                  - closed
+                  - decided
+              example:
+                open:
+                  - 4
+                  - 10
+                  - 55
+                closed: []
+                decided:
+                  - 12
+                  - 53
+          links:
+            getRequestOffers:
+              operationId: getRequestOffers
+              parameters:
+                offer_id: "$response.body#/open[*]"
+        400:
+          description: Error in the query parameters.
+        404:
+          description: Locker with given ID not found.
+        5XX:
+          description: Unexpected error.
+          
+  /marketplace/requests/{request_id}/offers:
+    parameters:
+      - in: path
+        name: request_id
+        description: The ID of the request to retrieve offers for.
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 1.844674407E19
+        required: true  
+    get:
+      operationId: getRequestOffers
+      summary: "!!! PARTIALLY IMPLEMENTED !!! Retrieve the offers submitted for a request, optionally filtered by user's input. At the moment, user's filtering is not supported."
+      tags:
+        - Marketplace
+      parameters:
+        - in: query
+          name: valid_at
+          description: OPTIONAL. The time at which the offer must be valid. If not specified, all the offers are returned. **Currently not supported**.
+          schema:
+            type: string
+            format: date-time
+        - in: query
+          name: valid_for
+          description: OPTIONAL. How long must the offer be valid, in minutes, from the time specified in `valid_at` (e.g. 30 min). If `valid_at` is specified, it must also be specified. **Currently not supported**.
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 1.844674407E19
+        - in: query
+          name: only_auction
+          description: OPTIONAL, default false. If true, restricts the results to only contain auction offers, with no instant rent. **Currently not supported**.
+          schema:
+            type: boolean
+            default: false
+      responses:
+        200:
+          description: Returns all the offer IDs matching the user's requirements for the given request.
+          content:
+            application/json:
+              schema:
+                type: array
+                description: The list of offers for request.
+                items:
+                  type: integer
+                  minimum: 1
+                  maximum: 1.844674407E19
+              example:
+                  - 2
+                  - 3
+                  - 14
+        400:
+          description: Error in the query parameters.
+        404:
+          description: Request with given ID not found.
+        5XX:
+          description: Unexpected error.   
+  
+  /marketplace/gettoken:
+    get:
+      operationId: getMarketplaceToken
+      summary: Return a token required to create a new request on the blockchain.
+      tags:
+        - Marketplace
+      security:
+        - BearerAuth: []  
+      parameters:
+        - in: query
+          name: ethereum_address
+          description: The Ethereum account that will create the request.
+          schema:
+            type: string
+          required: true          
+      responses:
+        201:
+          description: Returns the access token.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/MarketplaceAccessToken'
+                example:
+                  digest: '0xc4dabc49eb44973021d2f4ef1681fde9b74099c168d54f764bd3040c820dea3d'
+                  encoded: '0xa1f7afe9841e508b1baf684389c2cc6032188a202e6cfafbd02187c4e91b30ad6eb99a1a471e0575bFC76d7e189ab3354E0ecb70FCbf3E4651Cdd045E893528fB7C6F2DCEB07Efa9eb2FB375'
+                  signature: '0x2e6e106429ce2d1c1519db56a8411bfa421048282f692b8604a1e51688319f4c25fd88833bafeccd4b89f04c65965966943a0256a1f18847900148585a8086fc1b'
+                  nonce: '0xa1f7afe9841e508b1baf684389c2cc6032188a202e6cfafbd02187c4e91b30ad'
+        400:
+          description: Invalid Ethereum address parameter.
+        422:
+          description: Missing required query parameter.
+        5XX:
+          description: Unexpected error.
+      
+  /owners/{owner_id}:
+    parameters:
+      - in: path
+        name: owner_id
+        description: The ID of the smart locker owner
+        schema:
+          type: string
+          pattern: '^did:\w+:\w+$'
+        required: true  
+    get:
+      operationId: getOwnerDetails
+      summary: Retrieve the details of a smart locker owner.
+      tags:
+        - Smart locker owner
+      responses:
+        200:
+          description: Returns the details for the given owner.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/OwnerInfo"
+                properties:
+                  locker_ids:
+                    description: The IDs of the smart lockers under the owner's ownership.
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          minimum: 1
+                          maximum: 1.844674407E19
+                      required:
+                        - id
+                required:
+                  - locker_ids
+              example: 
+                name: Smart Locker Onwer 1 Inc.
+                address: Kaivokatu 12, 00100, Helsinki
+                description: Just the best one around 😉!
+                url: https://best-locker-owner.com
+                logo: WFGY3Eq5y6ATjGc2qRjO3O9URqFhjTk+uTFZeBvI3b+QlVaZ8wRyab5g8CyaGgIzaiXpR1M+ok/eSh7bh9nQmCtFxixXDDSC5HK6i6vpoBfcSkOuZgB6tNXaKyNddjBosP+VIilwU+ju3ZstmKHbKbNer01ZVDnnpoDgpwDuvfw=
+                phone: (+358) 3194112
+                locker_ids:
+                  - id: 312312
+                  - id: 187412
+                  - id: 12313213
+        404:
+          description: The owner with the given ID was not found.
+        5XX:
+          description: Unexpected error.
+
+  /registration:
+    post:
+      operationId: userRegistration
+      summary: "Register a new user with DID."
+      tags:
+        - Registration
+      requestBody:
+        description: The user registers by providing a fully-qualified DID and the related verification key (verkey).
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+            example:
+              did: "did:sov:V7tqpU5b3khe88hM6gehBb"
+              verkey: "GKtmbQEQ8M8CpGdEAQ3Kv75buqcUsQaLM5F4j3i1awVD"
+      responses:
+        201:
+          description: User succesfully registered.
+        422:
+          description: Bad data in input.
+        5XX:
+          description: Unexpected error.
+
+  /getchallenge/{user_did}:
+    get:
+      operationId: challengeDID
+      summary: "Retrieve challenge to prove DID ownership."
+      tags:
+        - Authentication
+      parameters:
+        - in: path
+          name: user_did
+          description: The DID of the user requesting the challenge.
+          schema:
+            type: string
+            pattern: '^did:\w+:\w+$'
+          required: true
+      responses:
+        200:
+          description: Challenge successfully retrieved.
+        422:
+          description: Bad data in input.
+        5XX:
+          description: Unexpected error.
+
+  /gettoken:
+    post:
+      operationId: getToken
+      summary: "Solve a challenge and Get the token to authenticate in the system."
+      tags:
+        - Authentication
+      requestBody:
+        description: The user return the solved challenge to the system to prove ownership of a given DID.
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+            example:
+              did: "did:sov:V7tqpU5b3khe88hM6gehBb"
+              challenge: "001584719795427360495340695794"
+              proof: "YWRzYWRzYXFlZm5qaWZ3cWVuYmpmbndsZ2Z3cWZnbnF3Z2xxd2dn"
+      responses:
+        200:
+          description: Challenge response is valid and a JWT has been generated.
+        422:
+          description: Bad data in input.
+        401:
+          description: Proof not valid.
+        403:
+          description: Invalid or missing input parameters.
+        5XX:
+          description: Unexpected error.
+        
+components:
+  schemas:
+    LockerInput:
+      description: Information requested by the system to the smart locker owner upon smart locker registration.
+      type: object
+      properties:
+        name:
+          description: Locker short name.
+          type: string
+        description:
+          description: Locker longer textual description.
+          type: string
+        location:
+          description: Locker GPS coordinates.
+          type: object
+          properties:
+            lat:
+              description: Locker latitude.
+              type: number
+              format: double
+              minimum: -90
+              maximum: 90
+            lon:
+              description: Locker longitude.
+              type: number
+              format: double
+              minimum: -180
+              maximum: 180
+            additional_info:
+              description: Locker additional location info.
+              type: string
+          required:
+            - lat
+            - lon
+        icon_image:
+          description: Locker main image, either as base64 encoded binary or as a URL (only HTTPS supported).
+          oneOf:
+            - type: string
+              format: byte
+            - type: string
+              pattern: '^https:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$'
+        additional_images:
+          description: Locker additional images, either as base64 encoded binary or as a URL (only HTTPS supported).
+          type: array
+          items:
+            oneOf:
+              - type: string
+                format: byte
+              - type: string
+                pattern: '^https:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$'
+        lock_mechanism:
+          description: Locker locking mechanism. Modes currently supported are:, i.e., how does the locker gets locked? Push to close, push to close after delay, tap to close, etc...
+          type: string
+          enum:
+            - push-to-lock
+            - push-to-lock-after-delay
+            - tap-to-lock
+      required:
+        - name
+        - location
+        - icon_image
+        - lock_mechanism
+    LockerCompleteInfo:
+      description: Complete information about a smart locker, including the one added by the system upon smart locker registration and returned as part of the locker details.
+      allOf:
+        - $ref: "#/components/schemas/LockerInput"
+      properties:
+        id:
+          description: ID uniquely identifying the smart locker in the system.
+          type: integer
+          minimum: 1
+          maximum: 1.844674407E19
+        owner_id:
+          description: The ID of the smart locker owner, which can be used to fetch additional details about the owner.
+          type: string
+          pattern: '^did:\w+:\w+$'
+      required:
+      - owner_id
+      - id
+    MarketplaceInfo:
+      description: Description of the marketplace on which a smart locker is for rent.
+      type: object
+      properties:
+        chain_id:
+          description: The Ethereum chain ID identifying the chain in the network on which the marketplace is running.
+          type: integer
+        marketplace_smart_contract_address:
+          type: string
+          pattern: '^(0x){1}[0-9a-fA-F]{40}$'
+      required: 
+      - chain_id
+      - marketplace_smart_contract_address
+    MarketplaceAccessToken:
+      description: Access token used to create new requests on the marketplace.
+      properties:
+        digest:
+          description: The SHA-3 hash of the access token, in HEX format.
+          type: string
+        encoded:
+          description: An Ethereum ABI encoding of the information in the access token.
+          type: string
+        signature:
+          description: The signature of the access token.
+          type: string
+        nonce:
+          description: The randomly-generated nonce for the access token, in HEX format.
+          type: string
+          pattern: '^[0-9a-f]*$'
+      required:
+        - digest
+        - encoded
+        - signature
+        - nonce
+    OwnerInfo:
+      description: Smart locker owner details.
+      properties:
+        id:
+          description: Smart locker owner identifier.
+          type: string
+          pattern: '^did:\w+:\w+$'
+        name:
+          description: Smart locker owner name (probably company name).
+          type: string
+        address:
+          description: Address of the smart locker owner (probably company legal address).
+          type: string
+        description:
+          description: Short description about the owner.
+          type: string          
+        url:
+          description: URL of the owner homepage (only HTTPS supported).
+          type: string
+          pattern: '^https:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$'
+        logo:
+          description: Owner's logo, either as base64 encoded binary or as a URL (only HTTPS supported).
+          oneOf:
+            - type: string
+              format: byte
+            - type: string
+              pattern: '^https:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$'
+        phone:
+          description: Phone contact of the owner. Format of the number not checked for now.
+          type: string
+      required: 
+      - id
+      - name
+      - address
+      - url
+      - phone
+  securitySchemes:
+    BearerAuth:
+      description: Protects endpoints by requiring a valid JWT in the request `Authorization` header.
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

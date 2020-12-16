@@ -1,0 +1,86 @@
+[
+  {
+    "@context": ["https://www.w3.org/2019/wot/td/v1"],
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "http://smaugexample.com/schema.json",
+    "properties": {
+      "price": {
+        "description": "The price for the locker",
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 50,
+        "forms": [{"href": "//api/status"}]
+      },
+    "required": ["price"]
+  }
+  }
+
+  {
+    "@context": ["https://www.w3.org/2019/wot/td/v1"],
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "http://smaugexample.com/schema2.json",
+    "title": "SMAUG data model schema",
+    "type": "object",
+    "securityDefinitions": {
+       "bearer_sc": {
+           "description": "bearer token available to locker renter",
+           "in": "header",
+           "scheme": "bearer",
+           "format": "jwt",
+           "alg": "ES256"
+       }
+    },
+    "security": ["bearer_sc"],
+    "properties": {
+      "lockerId": {
+        "description": "The unique identifier of the locker",
+        "type": "integer",
+        "forms": [{"href": "//api/status"}]
+      },
+      "smartContractAdds": {
+        "description": "The smart contract address of the locker",
+        "type":"string",
+        "forms": [{"href": "//api/status"}]
+      },
+      "authServiceUrl": {
+        "description": "The authorization server url",
+        "type": "string",
+        "forms": [{"href": "//api/status"}]
+      },
+      "price": {
+        "description": "The price for the locker",
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 50,
+        "forms": [{"href": "//api/status"}]
+      },
+      "volume":{
+        "description": "The volume of the locker in cc",
+        "type": "integer",
+        "minimum": 0,
+        "forms": [{"href": "//api/status"}]
+      },
+      "location":{
+        "type":"object",
+        "description": "The latitude and longitude of the locker in degrees",
+        "properties": {
+          "latitude":{
+            "type":"number",
+            "minimum": -90,
+            "maximum": 90,
+            "forms": [{"href": "//api/status"}]
+          },
+          "longitude":{
+            "type":"number",
+            "minimum": -180,
+            "maximum": 180,
+            "forms": [{"href": "//api/status"}]
+          }
+        },
+        "required": ["latitude", "longitude"],
+        "forms": [{"href": "//api/status"}]
+      }
+    },
+    "required": ["lockerId", "price", "volume"]
+  }
+]

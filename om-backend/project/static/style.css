@@ -1,0 +1,15 @@
+h1 {
+    padding-left: 50px;
+}
+
+input, select, textarea {
+    max-width: 200px;
+}
+
+input.long {
+	max-width: 600px;
+}
+
+tr.winning {
+    background-color: lightgreen;
+}

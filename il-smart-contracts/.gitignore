@@ -1,0 +1,8 @@
+app
+build
+types
+node_modules
+.vscode
+
+demo/node_modules
+demo/types

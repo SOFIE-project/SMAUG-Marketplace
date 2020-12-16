@@ -1,0 +1,1 @@
+A smart contract used for logging access token generated with [SOFIE PDS component](https://github.com/SOFIE-project/Privacy-and-Data-Sovereignty) 

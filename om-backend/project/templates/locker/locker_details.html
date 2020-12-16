@@ -1,0 +1,59 @@
+{% extends "smaug_base.html" %}
+
+{% block title %}Locker details{% endblock %}
+
+
+{% block page_content %}
+    <h1>Locker details</h1>
+
+    <div class="container">
+    <form class="form-horizontal">
+        <div class="form-group row">
+            <label class="control-label col-sm-2" for="id">Locker ID</label>
+            <div class="col-sm-10">
+                <input id="id" class="form-control long" readonly="readonly" type="text" value="{{ details.locker.id }}">
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <label class="control-label col-sm-2" for="id">Name</label>
+            <div class="col-sm-10">
+                <input id="name" class="form-control" readonly="readonly" type="text" value="{{ details.locker.name }}">
+            </div>
+        </div>
+
+
+        <div class="form-group row">
+            <label class="control-label col-sm-2">Location</label>
+			<label class="control-label col-sm-2" for="location_lat">Lat</label>
+			<input id="location_lat" class="form-control col-sm-8" readonly="readonly" type="text" value="{{ details.locker.location.lat }}">
+        </div>
+
+		<div class="form-group row">
+			<div class="col-sm-2"></div>
+			<label class="control-label col-sm-2" for="location_lon">Lon</label>
+			<input id="location_lat" class="form-control col-sm-8" readonly="readonly" type="text" value="{{ details.locker.location.lon }}">
+		</div>
+
+		<div class="form-group row">
+			<div class="col-sm-2"></div>
+			<label class="control-label col-sm-2" for="location_additional_info">Additional info</label>
+            <input id="location_additional_info" class="form-control col-sm-8" readonly="readonly" type="text" value="{{ details.locker.location.additional_info }}">
+		</div>
+
+        <div class="form-group row">
+            <label class="control-label col-sm-2" for="lock_mechanism">Lock mechanism</label>
+            <div class="col-sm-10">
+                <input id="lock_mechanism" class="form-control" readonly="readonly" type="text" value="{{ details.locker.lock_mechanism }}">
+            </div>
+        </div>
+
+        <td><a href="/user/create_request?locker={{ details.locker.id }}" class="btn btn-primary" role="button">Create request</a></td>
+        <td><a href="{{ url_for('user.get_lockers') }}" class="btn btn-default" role="button">Return</a></td>
+    </form>
+
+    </div>
+
+
+
+{% endblock %}

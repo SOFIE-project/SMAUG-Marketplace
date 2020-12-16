@@ -1,0 +1,5 @@
+id: client_wallet
+path: .
+key: password
+name: test_wallet.json
+seed: 000000000000000000000000Trustee1

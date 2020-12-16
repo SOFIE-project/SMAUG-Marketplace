@@ -1,0 +1,361 @@
+openapi: 3.0.0
+
+info:
+  title: Semantic Representation OpenAPI
+  description: Semantic Representation OpenAPI for validate data objects and schemas.
+  version: 1.0.0
+  contact:
+    name: Filippo Vimini
+    email: filippo.vimini@aalto.fi
+    
+externalDocs:
+  description: SOFIE project wiki
+  url: https://sofie.comnet.aalto.fi/index.php/Main_Page
+
+servers:
+  - url: /api/
+
+paths:
+
+  /schema/{id}:
+    parameters:
+      - in: path
+        name: id
+        description: The db's id of the schema. You can lists all schemas' ids with calling the API "schemas"
+        schema:
+          type: integer
+        required: true
+    get:
+      operationId: getSchema
+      summary: "Get a Schema or a Thing description from the system"
+      tags:
+        - SR schema
+      responses:
+        200:
+          description: Returns the requested json schema.
+          content:
+            application/json:
+              schema:
+                type: "object"
+              example: {
+                "@context": ["https://www.w3.org/2019/wot/td/v1"],
+                "$schema": "http://json-schema.org/draft-07/schema#",
+                "$id": "http://smaugexample.com/schema2.json",
+                "title": "SMAUG data model schema",
+                "type": "object",
+                "securityDefinitions": {
+                  "bearer_sc": {
+                    "description": "bearer token available to locker renter",
+                    "in": "header",
+                    "scheme": "bearer",
+                    "format": "jwt",
+                    "alg": "ES256"
+                  }
+                },
+                "security": ["bearer_sc"],
+                "properties": {
+                  "lockerId": {
+                    "description": "The unique identifier of the locker",
+                    "type": "integer",
+                    "forms": [{"href": "//api/status"}]
+                  },
+                  "price": {
+                    "description": "The price for the locker",
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 50,
+                    "forms": [{"href": "//api/status"}]
+                  }
+                },
+                "required": ["lockerId", "price"]
+              }
+        404:
+          description: Returns a json indicating the requested schema is not found.
+          content:
+            application/json:
+              schema:
+                type: "object"
+              example:
+                error: Not Found
+        5XX:
+          description: Unexpected error.
+    delete:
+      operationId: deleteSchema
+      summary: "Delete a Schema or a Thing description in the system"
+      tags:
+        - SR schema
+      responses:
+        201:
+          description: Returns a json indicating the schema is removed.
+          content:
+            application/json:
+              schema:
+                type: "object"
+              example:
+                message: schema removed
+        404:
+          description: Returns a json indicating the requested schema is not found.
+          content:
+            application/json:
+              schema:
+                type: "object"
+              example:
+                error: Not Found
+        5XX:
+          description: Unexpected error.
+
+  /schema:
+    post:
+      operationId: addSchema
+      summary: "Add a new schema or Thing Description to the component"
+      tags:
+        - SR schema
+      requestBody:
+        description: this API is used to add WoT schemas or WoT Thing descriptions to the system. These information will be used to validate the message against.
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "object"
+            example: {
+              "name": "test_schema",
+              "extend":"old_schema",
+              "schema": {
+                "@context": ["https://www.w3.org/2019/wot/td/v1"],
+                "$schema": "http://json-schema.org/draft-07/schema#",
+                "$id": "http://smaugexample.com/schema.json",
+                "title": "SMAUG data model schema",
+                "type": "object",
+                "security": ["bearer_sc"],
+                "properties": {
+                  "lockerId": {
+                    "description": "The unique identifier of the locker",
+                    "type": "integer",
+                    "forms": [{"href": "//api/status"}]
+                  },
+                  "volume":{
+                    "description": "The volume of the locker in cc",
+                    "type": "integer",
+                    "minimum": 0,
+                    "forms": [{"href": "//api/status"}]
+                  }
+                }
+              }
+            }
+      responses:
+        201:
+          description: Returns the schema added during the operation.
+          content:
+            application/json:
+              schema:
+                type: "object"
+              example: {
+                "@context": ["https://www.w3.org/2019/wot/td/v1"],
+                "$schema": "http://json-schema.org/draft-07/schema#",
+                "$id": "http://smaugexample.com/schema.json",
+                "title": "SMAUG data model schema",
+                "type": "object",
+                "security": ["bearer_sc"],
+                "properties": {
+                  "lockerId": {
+                    "description": "The unique identifier of the locker",
+                    "type": "integer",
+                    "forms": [{"href": "//api/status"}]
+                  },
+                  "volume":{
+                    "description": "The volume of the locker in cc",
+                    "type": "integer",
+                    "minimum": 0,
+                    "forms": [{"href": "//api/status"}]
+                  }
+                }
+              }
+        422:
+          description: Returns a json indicating bad data input.
+          content:
+            application/json:
+              schema:
+                type: "object"
+              example:
+                error: Unprocessable Entity
+                message: bad data input, must include schema and schema name
+        406:
+          description: Returns a json indicated that the extended schema is not found.
+          content:
+            application/json:
+              schema:
+                type: "object"
+              example:
+                error: Not Acceptable
+                message: Extended schema not in the DB
+        409:
+          description: Returns a json indicating that a schema with the same name is already saved.
+          content:
+            application/json:
+              schema:
+                type: "object"
+              example:
+                error: Conflict
+                message: schema name already saved
+        5XX:
+          description: Unexpected error.
+    put:
+      operationId: updateSchema
+      summary: "Update a schema or Thing Description on the component"
+      tags:
+        - SR schema
+      requestBody:
+        description: this API is used to update an existing WoT schemas or WoT Thing descriptions on the system.
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "object"
+            example: {
+              "name": "test_schema",
+              "schema": {
+                "@context": ["https://www.w3.org/2019/wot/td/v1"],
+                "$schema": "http://json-schema.org/draft-07/schema#",
+                "$id": "http://smaugexample.com/schema.json",
+                "title": "SMAUG data model schema",
+                "type": "object",
+                "security": ["bearer_sc"],
+                "properties": {
+                  "lockerId": {
+                    "description": "The unique identifier of the locker",
+                    "type": "integer",
+                    "forms": [{"href": "//api/status"}]
+                  },
+                  "volume":{
+                    "description": "The volume of the locker in cc",
+                    "type": "integer",
+                    "minimum": 0,
+                    "forms": [{"href": "//api/status"}]
+                  }
+                }
+              }
+            }
+      responses:
+        201:
+          description: Schema successfully updated, return a json with the updated schema
+          content:
+            application/json:
+              schema:
+                type: "object"
+              example: {
+                "@context": ["https://www.w3.org/2019/wot/td/v1"],
+                "$schema": "http://json-schema.org/draft-07/schema#",
+                "$id": "http://smaugexample.com/schema.json",
+                "title": "SMAUG data model schema",
+                "type": "object",
+                "security": ["bearer_sc"],
+                "properties": {
+                  "lockerId": {
+                    "description": "The unique identifier of the locker",
+                    "type": "integer",
+                    "forms": [{"href": "//api/status"}]
+                  },
+                  "volume":{
+                    "description": "The volume of the locker in cc",
+                    "type": "integer",
+                    "minimum": 0,
+                    "forms": [{"href": "//api/status"}]
+                  }
+                }
+              }
+        422:
+          description: Return a json indicating bad data input, the call must include schema and schema name in its json body.
+          content:
+            application/json:
+              schema:
+                type: "object"
+              example:
+                error: Unprocessable Entity
+                message: bad data input, must include schema and schema name
+
+        404:
+          description: The requested schema, indicated with the keyword "name" is not found, return a json indicating the schema is not found.
+          content:
+            application/json:
+              schema:
+                type: "object"
+              example:
+                error: Not Found
+        5XX:
+          description: Unexpected error.
+
+  /schemas:
+    get:
+      operationId: schemaList
+      summary: "Get the list of all saved schemas or a Thing description in the system with their db's id"
+      tags:
+        - SR schema
+      responses:
+        200:
+          description: Returns a json containing the list of the schemas'id and names saved in the system.
+          content:
+            application/json:
+              schema:
+                type: "object"
+              example:
+                1: http://smaugexample.com/schema.json
+                2: http://smaugexample.com/schema2.json
+        404:
+          description: Returns a json indicating that no schema is found in the system
+          content:
+            application/json:
+              schema:
+                type: "object"
+              example:
+                error: Not Found
+        5XX:
+          description: Unexpected error.
+
+  /validate:
+    post:
+      operationId: validateJson
+      summary: "validate a json against a specified schema"
+      tags:
+        - SR validation
+      requestBody:
+        description: This API is used to validate json messages sent by the IoT platforms
+        required: True
+        content:
+          application/json:
+            schema:
+              type: "object"
+            example: {
+              "message": {"lockerId": 1234, "price": 35, "volume": 15},
+              "schema": "test_schema"
+            }
+      responses:
+        204:
+          description: The validation succeeded
+        400:
+          description: The validation failed, returns a json with the description of what failed
+          content:
+            application/json:
+              schema:
+                type: "object"
+              example:
+                error: Bad Request
+                message: lockerId is a required property
+        404:
+            description: Returns a json indicating the required schema is not found.
+            content:
+              application/json:
+                schema:
+                  type: "object"
+                example:
+                  error: Not Found
+        422:
+          description: Return a json indicating bad data input, the call must include schema and schema name in its json body.
+          content:
+            application/json:
+              schema:
+                type: "object"
+              example:
+                error: Unprocessable Entity
+                message: bad data input, must include schema and schema name
+        5XX:
+            description: Unexpected error.

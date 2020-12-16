@@ -1,0 +1,5 @@
+[
+  {"username":"xyz","password":"xyz"},
+  {"lockerId":1234,"price":100, "volume":15},
+  {"lockerId":1234,"price":-5, "volume":15}
+]

@@ -1,0 +1,6 @@
+#!/usr/bin/env bash -x
+
+DOCKER_IMAGE="om-backend"
+DOCKER_TAG="latest"
+
+docker build --rm -t ${DOCKER_IMAGE}:${DOCKER_TAG} .

@@ -1,0 +1,32 @@
+{
+    "@context": "https://www.w3.org/2019/wot/td/v1",
+    "@type@": "SMAUGTemplate",
+    "title": "SMAUG Smart Locker Thing Description",
+    "version": "1.0",
+    "properties": {
+        "lockerDetails": {
+            "title": "Smart locker details",
+            "description": "Endpoint from which it is possible to retrieve details about the smart locker.",
+            "forms": [
+                {
+                    "op": "readallproperties",
+                    "security": "open_access",
+                    "response": {
+                        "contentType": "application/json"
+                    }
+                }
+            ],
+            "readonly": "true"
+        }
+    },
+    "links": {},
+    "forms": {},
+    "security": [],
+    "securityDefinitions": {
+        "open_access": {
+            "scheme": "nosec",
+            "description": "Access not restricted to anyone.",
+            "proxy": "https://smaug.sofie-iot.eu"
+        }
+    }
+}

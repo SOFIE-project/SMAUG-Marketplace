@@ -1,0 +1,32 @@
+{% extends "smaug_base.html" %}
+
+{% block title %}Lockers{% endblock %}
+
+
+{% block page_content %}
+    <h1>Lockers</h1>
+
+    <table class="table" style="max-width: 1200px; min-width: 1200px; margin-left: auto; margin-right: auto">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for locker in lockers %}
+                <tr>
+                    <td>{{ locker.locker.id }}</td>
+                    <td>{{ locker.locker.name }}</td>
+                    <td><a href="{{url_for('user.get_locker', locker_id=locker.locker.id)}}"
+                           class="btn btn-info" role="button">{{ _('Show Details') }}</a></td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <div class="text-left">
+            <a href="{{url_for('user.add_locker')}}"
+                           class="btn btn-info" role="button">{{ _('Add SmartLockers') }}</a>
+    </div>
+
+{% endblock %}

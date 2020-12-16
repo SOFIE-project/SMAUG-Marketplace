@@ -1,0 +1,42 @@
+{
+    "name": "smaug-marketplace-smart-contracts",
+    "version": "1.0.0",
+    "description": "Collection of smart contracts for the SMAUG marketplace.",
+    "author": "Antonio Antonino <antonio.antonino@ericsson.com>",
+    "license": "Apache 2.0",
+    "scripts": {
+        "postinstall": "npx typechain --target truffle",
+        "build": "npm run build:truffle && npm run build:contracts && npm run build:ts",
+        "build:truffle": "npx truffle compile",
+        "build:contracts": "npx typechain --target truffle './build/**/*.json'",
+        "build:ts": "npx tsc > /dev/null || true",
+        "test": "npm run build:truffle && npm run build:ts; npm run test:truffle",
+        "test:marketplace": "npm run build:truffle && npm run build:ts; npm run test:truffle -- --network marketplace",
+        "test:truffle": "npx truffle test",
+        "migrate": "npm run build; npx truffle migrate",
+        "migrate:marketplace": "npm run migrate -- --network marketplace",
+        "deploy:marketplace-local": "cd scripts && ./launch_marketplace_blockchain"
+    },
+    "dependencies": {
+        "@openzeppelin/contracts": "^2.5.0",
+        "sofie-interledger-contracts": "^0.3.0",
+        "sofie-offer-marketplace": "^0.3.5"
+    },
+    "devDependencies": {
+        "@types/bignumber.js": "^5.0.0",
+        "@types/chai": "^4.2.14",
+        "@types/mocha": "^7.0.2",
+        "@types/node": "^13.13.28",
+        "truffle": "^5.1.50",
+        "truffle-typings": "^1.0.8",
+        "ts-generator": "0.0.8",
+        "ts-node": "^8.8.1",
+        "typechain": "^1.0.5",
+        "typechain-target-truffle": "^1.0.2",
+        "typescript": "^4.0.3"
+    },
+    "files": [
+        "contracts/**/*.sol",
+        "build/contracts/*.json"
+    ]
+}

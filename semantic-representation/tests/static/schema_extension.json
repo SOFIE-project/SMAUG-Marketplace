@@ -1,0 +1,13 @@
+{
+  "@context": ["To Modify"],
+  "$id": "extendedSchema",
+  "security": ["basic_sc"],
+  "properties": {
+    "extended": {
+      "description": "An extended property for testing",
+      "type": "integer",
+      "forms": [{"href": "//api/status"}]
+    }
+  },
+  "required": ["extended"]
+}

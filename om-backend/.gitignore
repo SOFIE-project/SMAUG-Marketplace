@@ -1,0 +1,18 @@
+# Python
+env/
+__pycache__/
+project/__pycache__/
+project/api/__pycache__/
+project/errors/__pycache__/
+
+# IDE
+.idea/
+.vscode
+
+# flask env
+.env
+logs
+
+# Testing
+client_wallet/
+test_wallet.json
